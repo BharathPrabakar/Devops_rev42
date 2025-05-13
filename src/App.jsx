@@ -1,229 +1,205 @@
 import { useState } from 'react';
 
 function App() {
-  const [count, setCount] = useState(0);
-  const [activeTab, setActiveTab] = useState('deployment');
+  const [tasks, setTasks] = useState([]);
+  const [newTask, setNewTask] = useState('');
+  const [filter, setFilter] = useState('all');
 
-  // Shared style objects
-  const buttonBase = {
-    padding: '0.75rem 1.5rem',
-    margin: '0 0.5rem',
-    border: 'none',
-    background: 'none',
-    fontSize: '1rem',
-    cursor: 'pointer',
-    borderRadius: '4px',
-    transition: 'all 0.3s ease'
+  const addTask = () => {
+    if (newTask.trim()) {
+      setTasks([...tasks, { id: Date.now(), text: newTask, completed: false }]);
+      setNewTask('');
+    }
   };
 
-  const cardStyle = {
-    background: 'white',
-    borderRadius: '8px',
-    padding: '1.5rem',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)'
+  const toggleTask = (id) => {
+    setTasks(tasks.map(task => 
+      task.id === id ? { ...task, completed: !task.completed } : task
+    ));
   };
+
+  const deleteTask = (id) => {
+    setTasks(tasks.filter(task => task.id !== id));
+  };
+
+  const filteredTasks = tasks.filter(task => {
+    if (filter === 'completed') return task.completed;
+    if (filter === 'active') return !task.completed;
+    return true;
+  });
 
   return (
     <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      minHeight: '100vh',
-      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      maxWidth: '600px',
+      margin: '0 auto',
+      padding: '20px',
+      fontFamily: 'Arial, sans-serif',
       backgroundColor: '#f5f7fa',
-      color: '#333',
-      margin: 0
+      minHeight: '100vh'
     }}>
-      {/* Header */}
-      <header style={{
-        background: 'linear-gradient(135deg, #6e8efb, #a777e3)',
-        color: 'white',
-        padding: '2rem',
+      <h1 style={{
         textAlign: 'center',
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
+        color: '#2c3e50',
+        marginBottom: '30px'
+      }}>Task Manager</h1>
+      
+      <div style={{
+        display: 'flex',
+        marginBottom: '20px',
+        gap: '10px'
       }}>
-        <h1 style={{ margin: 0, fontSize: '2.5rem' }}>Cloud Deployment Dashboard</h1>
-        <p style={{ margin: '0.5rem 0 0', opacity: 0.9, fontSize: '1.1rem' }}>
-          React App deployed with Jenkins & Minikube
-        </p>
-      </header>
-
-      {/* Tabs */}
-      <nav style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
-        <button 
+        <input
+          type="text"
+          value={newTask}
+          onChange={(e) => setNewTask(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && addTask()}
+          placeholder="Add a new task..."
           style={{
-            ...buttonBase,
-            backgroundColor: activeTab === 'deployment' ? '#6c63ff' : 'transparent',
-            color: activeTab === 'deployment' ? 'white' : 'inherit'
+            flex: 1,
+            padding: '10px',
+            fontSize: '16px',
+            border: '1px solid #ddd',
+            borderRadius: '4px'
           }}
-          onClick={() => setActiveTab('deployment')}
-        >
-          Deployment Info
-        </button>
-        <button 
+        />
+        <button
+          onClick={addTask}
           style={{
-            ...buttonBase,
-            backgroundColor: activeTab === 'counter' ? '#6c63ff' : 'transparent',
-            color: activeTab === 'counter' ? 'white' : 'inherit'
+            padding: '10px 20px',
+            backgroundColor: '#3498db',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '16px',
+            fontWeight: 'bold'
           }}
-          onClick={() => setActiveTab('counter')}
         >
-          Interactive Demo
+          Add
         </button>
-      </nav>
+      </div>
 
-      {/* Main Content */}
-      <main style={{
-        flex: 1,
-        padding: '2rem',
-        maxWidth: '1200px',
-        margin: '0 auto',
-        width: '100%'
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        gap: '10px',
+        marginBottom: '20px'
       }}>
-        {activeTab === 'deployment' ? (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-            {/* Info Card */}
-            <div style={cardStyle}>
-              <h2 style={{ marginTop: 0, color: '#6c63ff' }}>CI/CD Pipeline</h2>
-              <ul style={{ paddingLeft: '1.5rem' }}>
-                <li style={{ listStyleType: '"✅"', paddingLeft: '0.5rem', marginBottom: '0.5rem' }}>React Application</li>
-                <li style={{ listStyleType: '"✅"', paddingLeft: '0.5rem', marginBottom: '0.5rem' }}>Automated Testing</li>
-                <li style={{ listStyleType: '"✅"', paddingLeft: '0.5rem', marginBottom: '0.5rem' }}>Jenkins Pipeline</li>
-                <li style={{ listStyleType: '"✅"', paddingLeft: '0.5rem', marginBottom: '0.5rem' }}>Docker Containerization</li>
-                <li style={{ listStyleType: '"✅"', paddingLeft: '0.5rem', marginBottom: '0.5rem' }}>Kubernetes Deployment (Minikube)</li>
-              </ul>
-            </div>
+        <button
+          onClick={() => setFilter('all')}
+          style={{
+            padding: '8px 16px',
+            backgroundColor: filter === 'all' ? '#2c3e50' : '#bdc3c7',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          All
+        </button>
+        <button
+          onClick={() => setFilter('active')}
+          style={{
+            padding: '8px 16px',
+            backgroundColor: filter === 'active' ? '#2c3e50' : '#bdc3c7',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Active
+        </button>
+        <button
+          onClick={() => setFilter('completed')}
+          style={{
+            padding: '8px 16px',
+            backgroundColor: filter === 'completed' ? '#2c3e50' : '#bdc3c7',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Completed
+        </button>
+      </div>
 
-            {/* Architecture */}
-            <div>
-              <h2 style={{ color: '#6c63ff' }}>System Architecture</h2>
-              <div style={{
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '8px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+      }}>
+        {filteredTasks.length === 0 ? (
+          <p style={{
+            textAlign: 'center',
+            padding: '20px',
+            color: '#7f8c8d'
+          }}>No tasks found</p>
+        ) : (
+          <ul style={{
+            listStyle: 'none',
+            padding: '0',
+            margin: '0'
+          }}>
+            {filteredTasks.map(task => (
+              <li key={task.id} style={{
+                padding: '15px',
+                borderBottom: '1px solid #eee',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'space-between',
-                marginTop: '1rem',
-                ...cardStyle
+                justifyContent: 'space-between'
               }}>
                 <div style={{
-                  background: '#6c63ff',
-                  color: 'white',
-                  padding: '0.75rem 1.5rem',
-                  borderRadius: '4px',
-                  textAlign: 'center'
-                }}>Git Repository</div>
-                <div style={{ color: '#6c63ff', fontSize: '1.5rem' }}>→</div>
-                <div style={{
-                  background: '#6c63ff',
-                  color: 'white',
-                  padding: '0.75rem 1.5rem',
-                  borderRadius: '4px',
-                  textAlign: 'center'
-                }}>Jenkins</div>
-                <div style={{ color: '#6c63ff', fontSize: '1.5rem' }}>→</div>
-                <div style={{
-                  background: '#6c63ff',
-                  color: 'white',
-                  padding: '0.75rem 1.5rem',
-                  borderRadius: '4px',
-                  textAlign: 'center'
-                }}>Docker</div>
-                <div style={{ color: '#6c63ff', fontSize: '1.5rem' }}>→</div>
-                <div style={{
-                  background: '#6c63ff',
-                  color: 'white',
-                  padding: '0.75rem 1.5rem',
-                  borderRadius: '4px',
-                  textAlign: 'center'
-                }}>Minikube</div>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div style={{
-            textAlign: 'center',
-            maxWidth: '500px',
-            margin: '0 auto',
-            ...cardStyle
-          }}>
-            <h2 style={{ color: '#6c63ff', marginTop: 0 }}>Interactive Counter</h2>
-            <p>This demonstrates state management in React</p>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '2rem 0'
-            }}>
-              <button 
-                style={{
-                  background: '#6c63ff',
-                  color: 'white',
-                  border: 'none',
-                  width: '50px',
-                  height: '50px',
-                  fontSize: '1.5rem',
-                  borderRadius: '50%',
-                  cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s ease'
-                }}
-                onClick={() => setCount(count - 1)}
-              >
-                -
-              </button>
-              <span style={{ fontSize: '2rem', margin: '0 1.5rem', minWidth: '60px', textAlign: 'center' }}>
-                {count}
-              </span>
-              <button 
-                style={{
-                  background: '#6c63ff',
-                  color: 'white',
-                  border: 'none',
-                  width: '50px',
-                  height: '50px',
-                  fontSize: '1.5rem',
-                  borderRadius: '50%',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s ease'
-                }}
-                onClick={() => setCount(count + 1)}
-              >
-                +
-              </button>
-            </div>
-            <button 
-              style={{
-                background: '#f5f7fa',
-                color: '#6c63ff',
-                border: '1px solid #6c63ff',
-                padding: '0.5rem 1.5rem',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-              onClick={() => setCount(0)}
-            >
-              Reset
-            </button>
-          </div>
+                  gap: '10px'
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={task.completed}
+                    onChange={() => toggleTask(task.id)}
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      cursor: 'pointer'
+                    }}
+                  />
+                  <span style={{
+                    textDecoration: task.completed ? 'line-through' : 'none',
+                    color: task.completed ? '#95a5a6' : '#2c3e50',
+                    fontSize: '18px'
+                  }}>
+                    {task.text}
+                  </span>
+                </div>
+                <button
+                  onClick={() => deleteTask(task.id)}
+                  style={{
+                    backgroundColor: '#e74c3c',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    padding: '5px 10px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Delete
+                </button>
+              </li>
+            ))}
+          </ul>
         )}
-      </main>
+      </div>
 
-      {/* Footer */}
-      <footer style={{
+      <div style={{
+        marginTop: '20px',
         textAlign: 'center',
-        padding: '1.5rem',
-        background: '#2d3748',
-        color: 'white'
+        color: '#7f8c8d'
       }}>
-        <p>Deployed with ❤️ using modern DevOps practices</p>
-        <p style={{ fontSize: '0.9rem', opacity: 0.8, marginTop: '0.5rem' }}>
-          React | Jenkins | Docker | Kubernetes (Minikube)
-        </p>
-      </footer>
+        {tasks.filter(t => !t.completed).length} tasks remaining
+      </div>
     </div>
   );
 }
