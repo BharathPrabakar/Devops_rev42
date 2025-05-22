@@ -18,4 +18,4 @@ RUN npm install --omit=dev
 RUN npm install -g serve
 
 EXPOSE 5173
-CMD ["serve", "-s", "dist", "-l", "5173"]
+CMD ["serve", "-s", "dist", "-l", "3000"]
